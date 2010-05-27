@@ -169,22 +169,21 @@ module WillPaginate
         (collection.empty?? 'entry' : collection.first.class.name.underscore.sub('_', ' '))
       
       if collection.total_pages < 2
-        case collection.size
+        html = case collection.size
         when 0; "No #{entry_name.pluralize} found"
         when 1; "Displaying <b>1</b> #{entry_name}"
         else;   "Displaying <b>all #{collection.size}</b> #{entry_name.pluralize}"
         end
       else
-        %{Displaying #{entry_name.pluralize} <b>%d&nbsp;-&nbsp;%d</b> of <b>%d</b> in total} % [
+        html = %{Displaying #{entry_name.pluralize} <b>%d&nbsp;-&nbsp;%d</b> of <b>%d</b> in total} % [
           collection.offset + 1,
           collection.offset + collection.length,
           collection.total_entries
         ]
       end
-    end
-    
-    if respond_to? :safe_helper
-      safe_helper :will_paginate, :paginated_section, :page_entries_info
+      
+      html = html.html_safe if html.respond_to? :html_safe
+      html
     end
     
     def self.total_pages_for_collection(collection) #:nodoc:
